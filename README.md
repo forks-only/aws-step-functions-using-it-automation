@@ -55,7 +55,7 @@ Open ITAutomationWorkFlow.yaml in the root directory
 
 2. Update the CodeUri path of all Lambda functions: Right now it is pointing to my S3 bucket. You can go to Artifacts folder and upload all the source code of Lambda and Sate machine in your account and then replace my S3 bucket path with yours.
 
-3. Launch the CloudFormation stack using the SAM CLI.
+3. Launch the CloudFormation stack using the SAM CLI. It will create 5 lambda functions and a state machine. You can see it in the output section of CloudFormation execution
 ```
 export SAM_S3_BUCKET={your-stack-name}
 export NOTIFICATION_EMAIL={your-email@domain.com}
@@ -67,10 +67,11 @@ sam deploy --s3-bucket $SAM_S3_BUCKET \
     --parameter-overrides NotificationEmail=$NOTIFICATION_EMAIL
 ```
 
+
 4. Check your email inbox to confirm SNS notifications.
 
 ## Configuring Event to target Step function
-Once the workflow engine is ready. You can configure events in CloudWatch and select State machine (AWS Step Functions) as the target.
+Once the workflow engine is ready. You can configure events in CloudWatch and select State machine (AWS Step Functions) as the target. Paste the following into a CloudWatch rule:
 
 ```
 {
