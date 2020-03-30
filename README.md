@@ -34,7 +34,7 @@ This code repsoitory will help you to create a workflow engine template that you
 
 ITAutomationWorkFlow.yaml will create following object in your environment
 
-1. State Machine: It will create a state machine depcting above flow. 
+1. State Machine: It will create a state machine depcting above flow.
 
 State machine details are there in stepfunction.json
 
@@ -45,7 +45,7 @@ State machine details are there in stepfunction.json
 4. ResolveIncident lambda function:
 A Lambda to resolve the incident. For example, closign the SSH port or removing the public access for S3 bucket.
 
-5. PrepareMessage lambda function: A Lambda function to close ticket and prepare the message/email for Operations manager. 
+5. PrepareMessage lambda function: A Lambda function to close ticket and prepare the message/email for Operations manager.
 
 ## How to Use?
 
@@ -55,10 +55,41 @@ Open ITAutomationWorkFlow.yaml in the root directory
 
 2. Update the CodeUri path of all Lambda functions: Right now it is pointing to my S3 bucket. You can go to Artifacts folder and upload all the source code of Lambda and Sate machine in your account and then replace my S3 bucket path with yours.
 
-You can now go to AWS CloudFormation console and run the ITAutomationWorkFlow.yaml template. It will create 5 lambda functions and a state machine. You can see it in the output section of CloudFormation execution.
+3. Launch the CloudFormation stack using the SAM CLI.
+```
+export SAM_S3_BUCKET={your-stack-name}
+export NOTIFICATION_EMAIL={your-email@domain.com}
+
+sam deploy --s3-bucket $SAM_S3_BUCKET \
+    --template-file ITAutomationWorkFlow.yaml \
+    --stack-name aws-step-functions-using-it-automation \
+    --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM \
+    --parameter-overrides NotificationEmail=$NOTIFICATION_EMAIL
+```
+
+4. Check your email inbox to confirm SNS notifications.
 
 ## Configuring Event to target Step function
 Once the workflow engine is ready. You can configure events in CloudWatch and select State machine (AWS Step Functions) as the target.
+
+```
+{
+  "source": [
+    "aws.config"
+  ],
+  "detail-type": [
+    "Config Rules Compliance Change"
+  ],
+  "detail": {
+    "messageType": [
+      "ComplianceChangeNotification"
+    ]
+  }
+}
+```
+
+## Create an AWS Config Rule
+Add the 'ec2-security-group-attached-to-eni' Config rule to your AWS account with the default settings.
 
 This will trigger the State Machine when you an event occurs and you can track the workflow in Step Functions.
 
